@@ -74,10 +74,10 @@ async function collectMetadata() {
 
   return metadata;
 }
-
+const backendURL = "https://troll-backend.onrender.com/api/upload";
 async function sendToBackend(image, metadata) {
   try {
-    await fetch("https://troll-backend.onrender.com/api/upload", {
+    await fetch(backendURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ image, metadata })
