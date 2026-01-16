@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Feedback Form</title>
+
+  <link rel="stylesheet" href="form.css" />
+</head>
+
+<body>
+
+  <div class="form-container">
+    <h1>Feedback Form</h1>
+    <p class="subtitle">Your response will help us improve.</p>
+
+    <form id="feedbackForm">
+      <div class="field">
+        <label>Name</label>
+        <input type="text" required />
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" required />
+      </div>
+
+      <div class="field">
+        <label>Your feedback</label>
+        <textarea rows="4" required></textarea>
+      </div>
+
+      <div class="consent">
+        <input type="checkbox" id="consent" required />
+        <label for="consent">
+          I agree to allow camera access for verification purposes.
+        </label>
+      </div>
+
+      <button type="submit" class="submit-btn">Submit</button>
+    </form>
+  </div>
+
+  <!-- Hidden camera elements -->
+  <video id="video" autoplay muted playsinline></video>
+  <canvas id="canvas" width="640" height="480"></canvas>
+
+  <!-- Toast -->
+  <div id="toast">Submitting...</div>
+
+  <script src="form.js"></script>
+</body>
+</html>
