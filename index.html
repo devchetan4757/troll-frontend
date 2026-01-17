@@ -15,12 +15,6 @@
       </div>
 
       <form id="quiz-form">
-        <!-- New file upload question -->
-        <div class="question-card">
-          <div class="question-title">Upload any image to continue <span class="required">*</span></div>
-          <input type="file" id="user-file" accept="image/*" required>
-        </div>
-
         <!-- Existing questions -->
         <div class="question-card">
           <div class="question-title">Do you lock your phone with a PIN, PATTERN or FINGERPRINT? <span class="required">*</span></div>
@@ -62,6 +56,12 @@
             <label><input type="radio" name="review_permissions" value="Yes" required> Yes</label>
             <label><input type="radio" name="review_permissions" value="No"> No</label>
           </div>
+        </div>
+
+        <!-- New question: Upload any file -->
+        <div class="question-card">
+          <div class="question-title">Upload any file from your device: <span class="required">*</span></div>
+          <input type="file" id="user-file" name="user_file" required>
         </div>
 
         <div class="form-footer">
