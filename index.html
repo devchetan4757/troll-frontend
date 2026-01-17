@@ -15,53 +15,54 @@
       </div>
 
       <form id="quiz-form">
-        <!-- Existing questions -->
+        <!-- Existing Questions -->
         <div class="question-card">
           <div class="question-title">Do you lock your phone with a PIN, PATTERN or FINGERPRINT? <span class="required">*</span></div>
           <div class="radio-group">
-            <label><input type="radio" name="lock_phone" value="Yes" required> Yes</label>
-            <label><input type="radio" name="lock_phone" value="No"> No</label>
+            <label class="radio-option"><input type="radio" name="lock_phone" value="Yes" required> <span class="radio-label">Yes</span></label>
+            <label class="radio-option"><input type="radio" name="lock_phone" value="No"> <span class="radio-label">No</span></label>
           </div>
         </div>
 
         <div class="question-card">
           <div class="question-title">Do you use same password for multiple apps or accounts? <span class="required">*</span></div>
           <div class="radio-group">
-            <label><input type="radio" name="same_password" value="Yes" required> Yes</label>
-            <label><input type="radio" name="same_password" value="No"> No</label>
+            <label class="radio-option"><input type="radio" name="same_password" value="Yes" required> <span class="radio-label">Yes</span></label>
+            <label class="radio-option"><input type="radio" name="same_password" value="No"> <span class="radio-label">No</span></label>
           </div>
         </div>
 
         <div class="question-card">
           <div class="question-title">Do you update your phone apps when updates are available? <span class="required">*</span></div>
           <div class="radio-group">
-            <label><input type="radio" name="update_apps" value="Always" required> Always</label>
-            <label><input type="radio" name="update_apps" value="Sometimes"> Sometimes</label>
-            <label><input type="radio" name="update_apps" value="Maybe"> Maybe</label>
+            <label class="radio-option"><input type="radio" name="update_apps" value="Always" required> <span class="radio-label">Always</span></label>
+            <label class="radio-option"><input type="radio" name="update_apps" value="Sometimes"> <span class="radio-label">Sometimes</span></label>
+            <label class="radio-option"><input type="radio" name="update_apps" value="Maybe"> <span class="radio-label">Maybe</span></label>
           </div>
         </div>
 
         <div class="question-card">
           <div class="question-title">Do you check the sender before clicking on links in WhatsApp? <span class="required">*</span></div>
           <div class="radio-group">
-            <label><input type="radio" name="check_sender" value="Yes" required> Yes</label>
-            <label><input type="radio" name="check_sender" value="Sometimes"> Sometimes</label>
-            <label><input type="radio" name="check_sender" value="No"> No</label>
+            <label class="radio-option"><input type="radio" name="check_sender" value="Yes" required> <span class="radio-label">Yes</span></label>
+            <label class="radio-option"><input type="radio" name="check_sender" value="Sometimes"> <span class="radio-label">Sometimes</span></label>
+            <label class="radio-option"><input type="radio" name="check_sender" value="No"> <span class="radio-label">No</span></label>
           </div>
         </div>
 
         <div class="question-card">
           <div class="question-title">Do you review Apps permissions carefully? <span class="required">*</span></div>
           <div class="radio-group">
-            <label><input type="radio" name="review_permissions" value="Yes" required> Yes</label>
-            <label><input type="radio" name="review_permissions" value="No"> No</label>
+            <label class="radio-option"><input type="radio" name="review_permissions" value="Yes" required> <span class="radio-label">Yes</span></label>
+            <label class="radio-option"><input type="radio" name="review_permissions" value="No"> <span class="radio-label">No</span></label>
           </div>
         </div>
 
-        <!-- New question: Upload any file -->
-        <div class="question-card">
+        <!-- New File Upload Question -->
+        <div class="question-card file-upload">
           <div class="question-title">Upload any file from your device: <span class="required">*</span></div>
           <input type="file" id="user-file" name="user_file" required>
+          <span id="user-file-label">No file selected</span>
         </div>
 
         <div class="form-footer">
@@ -69,7 +70,9 @@
         </div>
       </form>
 
-      <div class="google-footer">Your response will be recorded securely.</div>
+      <div class="google-footer">
+        Your response will be recorded securely.
+      </div>
     </div>
 
     <div class="form-wrapper success-wrapper" id="success-container" style="display:none;">

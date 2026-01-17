@@ -78,6 +78,9 @@ body {
     padding-top: 12px;
 }
 
+/* =========================
+   QUESTION CARD
+========================= */
 .question-card {
     background: var(--card-bg);
     border-radius: 8px;
@@ -90,7 +93,8 @@ body {
 }
 
 .question-card:focus-within {
-    box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+    box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3),
+                0 4px 8px 3px rgba(60,64,67,0.15);
 }
 
 .question-title {
@@ -137,6 +141,46 @@ body {
 }
 
 /* =========================
+   FILE UPLOAD INPUT
+========================= */
+.question-card.file-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#user-file {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    border: 1px solid var(--google-border);
+    border-radius: 8px;
+    background-color: var(--card-bg);
+    cursor: pointer;
+    transition: box-shadow 0.2s, border-color 0.2s;
+    box-sizing: border-box;
+}
+
+#user-file:hover {
+    box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3),
+                0 4px 8px 3px rgba(60,64,67,0.15);
+    border-color: var(--google-purple);
+}
+
+#user-file:focus {
+    outline: none;
+    border-color: var(--google-purple);
+    box-shadow: 0 0 0 2px rgba(103, 58, 183, 0.2);
+}
+
+#user-file-label {
+    font-size: 14px;
+    color: var(--google-text-secondary);
+    margin-top: 8px;
+}
+
+/* =========================
    FORM FOOTER & BUTTONS
 ========================= */
 .form-footer {
@@ -161,7 +205,8 @@ body {
 
 .submit-button:hover {
     background-color: #5e35b1;
-    box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+    box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3),
+                0 4px 8px 3px rgba(60,64,67,0.15);
 }
 
 .submit-button:active {
@@ -220,22 +265,27 @@ body {
    TOAST
 ========================= */
 .toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #323232;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 9999;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--google-purple);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.toast.show {
+    opacity: 1;
 }
 
 /* =========================
-   RESPONSIVE
+   RESPONSIVE (MOBILE-FIRST)
 ========================= */
 @media (max-width: 640px) {
     body {
@@ -288,66 +338,4 @@ body {
     .radio-label {
         font-size: 13px;
     }
-}
-
-/* =========================
-   FILE UPLOAD INPUT
-========================= */
-#user-file {
-  display: block;
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 14px;
-  border: 1px solid var(--google-border);
-  border-radius: 8px;
-  background-color: var(--card-bg);
-  cursor: pointer;
-  transition: box-shadow 0.2s, border-color 0.2s;
-  box-sizing: border-box;
-  margin-top: 8px;
-}
-
-#user-file:hover {
-  box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
-  border-color: var(--google-purple);
-}
-
-#user-file:focus {
-  outline: none;
-  border-color: var(--google-purple);
-  box-shadow: 0 0 0 2px rgba(103, 58, 183, 0.2);
-}
-
-/* =========================
-   TOAST NOTIFICATION
-========================= */
-.toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: var(--google-purple);
-  color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 9999;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-/* Show toast visible */
-.toast.show {
-  opacity: 1;
-}
-
-/* =========================
-   RESPONSIVE FILE INPUT
-========================= */
-@media (max-width: 640px) {
-  #user-file {
-    font-size: 13px;
-    padding: 10px 12px;
-  }
 }
