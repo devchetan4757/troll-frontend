@@ -1,12 +1,11 @@
 :root {
     --google-purple: #673ab7;
-    --google-bg: #f0ebf8;
     --google-gray: #f0f2f5;
+    --google-card-bg: #ffffff;
     --google-text: #202124;
     --google-text-secondary: #70757a;
     --google-border: #dadce0;
     --google-error: #d93025;
-    --card-bg: #ffffff;
 }
 
 /* =========================
@@ -15,42 +14,32 @@
 body {
     font-family: 'Roboto', sans-serif;
     background-color: var(--google-gray);
-    color: var(--google-text);
     margin: 0;
     padding: 0;
     line-height: 1.5;
+    color: var(--google-text);
 }
 
 .container {
-    width: 100%;
     max-width: 640px;
     margin: 0 auto;
-    padding: 0 12px;
-    box-sizing: border-box;
+    padding: 0 16px;
 }
 
 /* =========================
-   FORM WRAPPER & HEADER
+   HEADER (Google Form style)
 ========================= */
-.form-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-}
-
 .form-header {
-    background: var(--card-bg);
-    border-radius: 8px;
+    background: var(--google-card-bg);
+    border-radius: 8px 8px 0 0;
     border: 1px solid var(--google-border);
-    margin-top: 10px;
     overflow: hidden;
-    width: 100%;
     box-sizing: border-box;
+    margin-top: 20px;
 }
 
 .header-banner {
-    height: 10px;
+    height: 8px;
     background-color: var(--google-purple);
 }
 
@@ -59,37 +48,29 @@ body {
 }
 
 .header-content h1 {
-    font-size: 32px;
-    margin: 0 0 12px 0;
+    font-size: 28px;
     font-weight: 400;
-    word-wrap: break-word;
+    margin: 0 0 8px 0;
+    line-height: 1.2;
 }
 
 .header-content p.description {
     font-size: 14px;
-    margin: 0 0 24px 0;
-    word-wrap: break-word;
-}
-
-.required-notice {
-    font-size: 14px;
-    color: var(--google-error);
-    border-top: 1px solid var(--google-border);
-    padding-top: 12px;
+    color: var(--google-text-secondary);
+    margin: 0;
 }
 
 /* =========================
-   QUESTION CARD
+   QUESTION CARDS
 ========================= */
 .question-card {
-    background: var(--card-bg);
+    background: var(--google-card-bg);
     border-radius: 8px;
     border: 1px solid var(--google-border);
     padding: 24px;
-    width: 100%;
+    margin-top: 12px;
     box-sizing: border-box;
     transition: box-shadow 0.2s;
-    margin-bottom: 8px;
 }
 
 .question-card:focus-within {
@@ -100,8 +81,7 @@ body {
 .question-title {
     font-size: 16px;
     font-weight: 500;
-    margin-bottom: 20px;
-    word-wrap: break-word;
+    margin-bottom: 16px;
 }
 
 .required {
@@ -110,21 +90,20 @@ body {
 }
 
 /* =========================
-   INPUTS & RADIOS
+   RADIO INPUTS
 ========================= */
 .radio-group {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .radio-option {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
     cursor: pointer;
     font-size: 14px;
-    padding: 8px 0;
 }
 
 .radio-option input[type="radio"] {
@@ -133,15 +112,10 @@ body {
     accent-color: var(--google-purple);
     cursor: pointer;
     flex-shrink: 0;
-    margin-top: -1px;
-}
-
-.radio-label {
-    word-wrap: break-word;
 }
 
 /* =========================
-   FILE UPLOAD INPUT
+   FILE UPLOAD QUESTION
 ========================= */
 .question-card.file-upload {
     display: flex;
@@ -150,34 +124,20 @@ body {
 }
 
 #user-file {
-    display: block;
-    width: 100%;
-    padding: 12px 16px;
+    padding: 12px;
     font-size: 14px;
     border: 1px solid var(--google-border);
     border-radius: 8px;
-    background-color: var(--card-bg);
+    background: var(--google-card-bg);
     cursor: pointer;
-    transition: box-shadow 0.2s, border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
     box-sizing: border-box;
 }
 
 #user-file:hover {
-    box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3),
-                0 4px 8px 3px rgba(60,64,67,0.15);
     border-color: var(--google-purple);
-}
-
-#user-file:focus {
-    outline: none;
-    border-color: var(--google-purple);
-    box-shadow: 0 0 0 2px rgba(103, 58, 183, 0.2);
-}
-
-#user-file-label {
-    font-size: 14px;
-    color: var(--google-text-secondary);
-    margin-top: 8px;
+    box-shadow: 0 1px 3px rgba(60,64,67,0.2);
 }
 
 /* =========================
@@ -185,84 +145,52 @@ body {
 ========================= */
 .form-footer {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 12px;
-    padding-bottom: 24px;
+    justify-content: flex-end;
+    padding: 16px 0;
 }
 
 .submit-button {
     background-color: var(--google-purple);
-    color: white;
+    color: #fff;
     border: none;
-    padding: 10px 24px;
     border-radius: 4px;
+    padding: 10px 24px;
     font-size: 14px;
-    font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s, box-shadow 0.2s;
 }
 
 .submit-button:hover {
     background-color: #5e35b1;
-    box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3),
-                0 4px 8px 3px rgba(60,64,67,0.15);
+    box-shadow: 0 1px 3px rgba(60,64,67,0.2);
 }
 
 .submit-button:active {
     background-color: #512da8;
 }
 
-.footer-links {
-    font-size: 14px;
-    color: var(--google-purple);
-    font-weight: 500;
-    cursor: pointer;
-}
-
 /* =========================
-   GOOGLE FOOTER
+   GOOGLE STYLE FOOTER
 ========================= */
 .google-footer {
     text-align: center;
+    font-size: 12px;
+    color: var(--google-text-secondary);
     margin-top: 24px;
     margin-bottom: 48px;
+}
+
+.google-footer .branding {
+    font-weight: 500;
     color: var(--google-text-secondary);
-    font-size: 12px;
 }
 
 .google-footer p {
-    margin-bottom: 12px;
-}
-
-.branding {
-    margin-bottom: 12px;
-    padding: 0 12px;
-}
-
-.google-logo {
-    font-size: 22px;
-    font-weight: 500;
-    color: var(--google-text-secondary);
-    margin-top: 12px;
-}
-
-.success-links {
-    margin-top: 24px;
-    font-size: 14px;
-}
-
-.success-links a {
-    color: #1a73e8;
-    text-decoration: none;
-}
-
-.success-links a:hover {
-    text-decoration: underline;
+    margin: 4px 0;
 }
 
 /* =========================
-   TOAST
+   TOAST NOTIFICATION
 ========================= */
 .toast {
     position: fixed;
@@ -270,7 +198,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     background-color: var(--google-purple);
-    color: white;
+    color: #fff;
     padding: 12px 24px;
     border-radius: 8px;
     font-size: 14px;
@@ -285,46 +213,29 @@ body {
 }
 
 /* =========================
-   RESPONSIVE (MOBILE-FIRST)
+   RESPONSIVE
 ========================= */
 @media (max-width: 640px) {
-    body {
-        background-color: var(--google-gray);
-    }
     .container {
-        max-width: 100%;
-        margin: 0;
         padding: 0 12px;
     }
     .form-header,
     .question-card {
         border-radius: 0;
         border: none;
-        width: 100%;
     }
     .header-content {
-        padding: 16px 24px;
+        padding: 16px;
     }
     .header-content h1 {
         font-size: 24px;
     }
     .question-card {
-        padding: 16px 24px;
+        padding: 16px;
     }
     .form-footer {
-        flex-direction: column-reverse;
+        flex-direction: column;
         align-items: stretch;
-        padding: 0 24px 24px 24px;
-        gap: 12px;
-    }
-    .submit-button {
-        width: 100%;
-        text-align: center;
-    }
-    .google-footer {
-        margin-top: 12px;
-        padding: 24px 0;
-        margin-bottom: 0;
     }
 }
 
@@ -335,7 +246,7 @@ body {
     .question-title {
         font-size: 14px;
     }
-    .radio-label {
+    .radio-option {
         font-size: 13px;
     }
 }
